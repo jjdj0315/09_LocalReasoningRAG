@@ -1,7 +1,7 @@
 from langchain.retrievers import ContextualCompressionRetriever
 from langchain.retrievers.document_compressors import CrossEncoderReranker
 from langchain_community.cross_encoders import HuggingFaceCrossEncoder
-
+from utils.retriever import retriever
 model = HuggingFaceCrossEncoder(model_name="BAAI/bge-reranker-base")
 
 compressor = CrossEncoderReranker(model=model, top_n=5)
