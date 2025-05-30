@@ -7,7 +7,7 @@ from langchain_community.cross_encoders import HuggingFaceCrossEncoder
 from .model import embeddings
 from .retriever import doc_load
 from .retriever import doc_split
-
+# from .qdrant import client
 def creat_compression_retriever(FILE_PATH):
         #로드
         docs = doc_load(FILE_PATH)
@@ -20,8 +20,10 @@ def creat_compression_retriever(FILE_PATH):
             documents=splits,
             embedding=embeddings,
             location=":memory:",
+            # location=".cache/qdrant", 
+            #client = client,
             collection_name="rag_collection_0228",
-            retrieval_mode=RetrievalMode.DENSE
+            retrieval_mode = RetrievalMode.DENSE
         )        
         #리트리버
         retriever = vector_store.as_retriever(search_kwargs = {'k':10})
