@@ -21,6 +21,13 @@ with st.sidebar:
 
     st.markdown("# **made by JDJ**")
 
+    # 로더 선택
+    selected_loader = st.radio(
+        "로더 선택", ["docling", "PDFPlumber", "정대진"], index=0
+    )
+    # selected_loader = st.selectbox(
+    #     "로더 선택", ["docling", "PDFPlumber", "정대진"], index=0
+    # )
     # 파일 업로드
     file = st.file_uploader("PDF 파일 업로드", type=["pdf"])
 
@@ -35,10 +42,13 @@ if clear_btn:
 
 # 설정 버튼이 눌리면
 if apply_btn:
-    FILE_PATH = upload_file(file)
-    st.session_state["compression_retriever"] = creat_compression_retriever(
-        FILE_PATH
-    )  # 이 부분에서 retriever가 세션에 저장됨
+    if file:
+        FILE_PATH = upload_file(file)
+
+        st.session_state["compression_retriever"] = creat_compression_retriever(
+            FILE_PATH
+        )  # 이 부분에서 retriever가 세션에 저장됨
+        compression_retriever = st.session_state["compression_retriever"]
     app = create_app()
     st.session_state["app"] = app
     st.session_state["thread_id"] = random_uuid()
@@ -56,9 +66,8 @@ if user_input:
     st.chat_message("user").write(user_input)
     add_message("user", user_input)
 
-    if "app" in st.session_state and "compression_retriever" in st.session_state:
+    if "app" in st.session_state:
         app = st.session_state["app"]
-        compression_retriever = st.session_state["compression_retriever"]
 
         # app.py 의 user_input 처리 부분
         try:
@@ -80,5 +89,5 @@ if user_input:
         # AI의 메시지가 출력력
         st.chat_message("ai").write(ai_answer)
         add_message("ai", ai_answer)
-    else:
-        st.warning("PDF 파일을 먼저 업로드하고 그래프를 초기화해주세요.")
+    # else:
+    #     st.warning("PDF 파일을 먼저 업로드하고 그래프를 초기화해주세요.")
