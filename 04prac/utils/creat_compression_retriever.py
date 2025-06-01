@@ -13,9 +13,10 @@ from .model import embeddings
 
 
 # from .qdrant import client
-@st.cache_resource(show_spinner="파일을 처리중입니다. 잠시만 기다려주세요.")
+@st.cache_resource(show_spinner=False)
 def creat_compression_retriever(FILE_PATH, selected_loader):
     # 로드
+    st.info("🔍 문서 로딩 중...")
     splits = doc_load(FILE_PATH, selected_loader)
 
     # 캐싱지원 임베딩 설정
@@ -27,6 +28,7 @@ def creat_compression_retriever(FILE_PATH, selected_loader):
     )
 
     # 벡터디비
+    st.info("📦 벡터 저장소 구축 중...")
     vector_store = QdrantVectorStore.from_documents(
         documents=splits,
         embedding=cached_embeddings,
@@ -46,4 +48,5 @@ def creat_compression_retriever(FILE_PATH, selected_loader):
     compression_retriever = ContextualCompressionRetriever(
         base_compressor=compressor, base_retriever=retriever
     )
+    st.success("✅ 압축 리트리버 준비 완료!")
     return compression_retriever

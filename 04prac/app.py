@@ -44,14 +44,13 @@ if clear_btn:
 if apply_btn:
     if file:
         FILE_PATH = upload_file(file)
-
         st.session_state["compression_retriever"] = creat_compression_retriever(
             FILE_PATH, selected_loader
         )  # 이 부분에서 retriever가 세션에 저장됨
         compression_retriever = st.session_state["compression_retriever"]
-    app = create_app()
-    st.session_state["app"] = app
-    st.session_state["thread_id"] = random_uuid()
+        app = create_app()
+        st.session_state["app"] = app
+        st.session_state["thread_id"] = random_uuid()
 
 # 사용자 입력
 user_input = st.chat_input("궁금한 내용을 물어보세요")
