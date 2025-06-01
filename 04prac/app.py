@@ -46,7 +46,7 @@ if apply_btn:
         FILE_PATH = upload_file(file)
 
         st.session_state["compression_retriever"] = creat_compression_retriever(
-            FILE_PATH
+            FILE_PATH, selected_loader
         )  # 이 부분에서 retriever가 세션에 저장됨
         compression_retriever = st.session_state["compression_retriever"]
     app = create_app()
