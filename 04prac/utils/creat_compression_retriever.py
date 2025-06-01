@@ -1,10 +1,11 @@
+import streamlit as st
 from langchain_qdrant import QdrantVectorStore
 from langchain_qdrant import RetrievalMode
 from langchain.retrievers import ContextualCompressionRetriever
 from langchain.retrievers.document_compressors import CrossEncoderReranker
 from langchain_community.cross_encoders import HuggingFaceCrossEncoder
-
-
+from langchain.storage import LocalFileStore
+from langchain.embeddings import CacheBackedEmbeddings
 from .retriever import doc_load
 from .model import embeddings
 
@@ -12,14 +13,23 @@ from .model import embeddings
 
 
 # from .qdrant import client
+@st.cache_resource(show_spinner="파일을 처리중입니다. 잠시만 기다려주세요.")
 def creat_compression_retriever(FILE_PATH, selected_loader):
     # 로드
     splits = doc_load(FILE_PATH, selected_loader)
 
+    # 캐싱지원 임베딩 설정
+    cache_dir = LocalFileStore(f".cache/embeddings")
+
+    EMBEDDING_MODEL = "bge-m3"
+    cached_embeddings = CacheBackedEmbeddings.from_bytes_store(
+        embeddings, cache_dir, namespace=EMBEDDING_MODEL
+    )
+
     # 벡터디비
     vector_store = QdrantVectorStore.from_documents(
         documents=splits,
-        embedding=embeddings,
+        embedding=cached_embeddings,
         location=":memory:",
         # location=".cache/qdrant",
         # client = client,
