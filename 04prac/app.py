@@ -7,6 +7,7 @@ from utils.creat_compression_retriever import creat_compression_retriever
 from utils.upload import upload_file
 from utils.node import create_app
 from utils.add_message import add_message
+from utils.print_messages import print_messages
 
 session_control()
 create_dir()
@@ -58,6 +59,8 @@ user_input = st.chat_input("궁금한 내용을 물어보세요")
 # 경고메시지를 띄우기 위한 빈 영역
 warning_msg = st.empty()
 
+# 이전 대화기록출력
+print_messages()
 
 user_input = st.chat_input()
 if user_input:
