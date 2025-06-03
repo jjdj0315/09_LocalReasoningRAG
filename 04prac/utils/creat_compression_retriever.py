@@ -42,7 +42,7 @@ def creat_compression_retriever(FILE_PATH, selected_loader):
     retriever = vector_store.as_retriever(search_kwargs={"k": 10})
 
     # 리랭커
-    model = HuggingFaceCrossEncoder(model_name="BAAI/bge-reranker-base")
+    model = HuggingFaceCrossEncoder(model_name="../models/bge-reranker-base")
 
     compressor = CrossEncoderReranker(model=model, top_n=5)
     compression_retriever = ContextualCompressionRetriever(
