@@ -1,16 +1,21 @@
+# utils/model.py
 from langchain_ollama import ChatOllama
 from langchain_ollama import OllamaEmbeddings
 
-# reasoning_llm은 스트리밍 필요 없음 (invoke 사용)
-reasoning_llm = ChatOllama(model="deepseek-r1:7b", stop=["</think>"])
+# reasoning_llm 스트리밍 활성화 확인
+reasoning_llm = ChatOllama(
+    model="deepseek-r1:7b",  # 실제 사용하시는 모델
+    stop=["</think>"],
+    streaming=True,  # <--- 여기가 True여야 함
+)
 
-# answer_llm은 스트리밍 활성화
+# answer_llm 스트리밍 활성화 확인
 answer_llm = ChatOllama(
-    model="exaone3.5",  # 또는 사용하시는 LLM 모델
+    model="exaone3.5",  # 실제 사용하시는 모델
     temperature=0,
-    streaming=True,  # <--- 이 부분이 반드시 True여야 합니다.
+    streaming=True,  # <--- 여기가 True여야 함
 )
 
 embeddings = OllamaEmbeddings(
-    model="bge-m3:latest",  # 또는 사용하시는 임베딩 모델
+    model="bge-m3:latest",  # 실제 사용하시는 임베딩 모델
 )
