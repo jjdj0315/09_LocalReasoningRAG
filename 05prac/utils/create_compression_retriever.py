@@ -3,6 +3,9 @@ from langchain.storage import LocalFileStore
 from langchain.embeddings import CacheBackedEmbeddings
 from langchain_qdrant import QdrantVectorStore
 from langchain_qdrant import RetrievalMode
+from langchain_community.cross_encoders import HuggingFaceCrossEncoder
+from langchain.retrievers.document_compressors import cross_encoder_rerank
+from langchain.retrievers import ContextualCompressionRetriever
 from .retriever import doc_load
 from .model import embeddings
 
@@ -31,4 +34,14 @@ def create_compression_retriever(FILE_PATH, selected_loader):
         collection_name="rag_collection_0228",
         retriever_mode=RetrievalMode.DENSE,
     )
+    # 리트리버 생성
+    retriever = vector_store.as_retriever(search_kwargs={"k": 10})
+    # 리랭커
+    model = HuggingFaceCrossEncoder(model_name="./models/bge-reranker-base")
+    compressor = cross_encoder_rerank(model=model, top_n=5)
+    compression_retriever = ContextualCompressionRetriever(
+        base_compressor=compressor, base_retriever=retriever
+    )
+    st.success("압축 리트리버 완료")
+
     return compression_retriever
