@@ -1,6 +1,6 @@
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
-
+from .state import RAGState
 from .model import reasoning_llm
 
 classify_llm_chain = ChatPromptTemplate.from_template(
@@ -23,6 +23,21 @@ classify_llm_chain = ChatPromptTemplate.from_template(
 
 
 # 1. 질문 분류 함수 - 중요: 여기서는 상태를 업데이트하는 노드 함수
-def classify_node():
+def classify_node(state: RAGState):
+    """질문을 분류하여 처리모드를 결저합니다."""
+    query = state["query"]
+    print("질문 분류 시작 : {query}")
 
+    # 정의된 classify_llm_chain을 사용하야 질문 의도 분류
+    classification = classify_llm_chain.invoke({"query": query})
+
+    print(f"====질문 분류 완료 : {classification}====")
+
+    # 분류 결과에 따라 mode상태를 설정합니다.
+    if "retrieve" in classification.lower():
+        mode = "retreive"
+    else:
+        mode = "generate"
+
+    print("모드 결정 {mode}")
     return {"mode": mode}
