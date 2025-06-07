@@ -2,6 +2,8 @@ import streamlit as st
 
 from utils.uuid import random_uuid
 from utils.print_messages import print_messages
+from utils.upload import upload_file
+from utils.create_compression_retriever import creat_compression_retriever
 
 st.title("LOCAL LLM RAG")
 st.markdown("OnPromise LLM RAG")
@@ -36,9 +38,12 @@ warning_msg = st.empty()
 # 이전 대화 기록 출력
 print_messages()
 
-#설정 버튼이 눌리면
+# 설정 버튼이 눌리면
 if apply_btn:
     if file:
         with st.spinner("파일 처리 및 RAG 설정 중"):
-            st.session_state["compression_retriever"] = create_compression_retriever(FILE_PATH, selected_loader)
-            
+            FILE_PATH = upload_file(file)
+            st.session_state["compression_retriever"] = creat_compression_retriever(
+                FILE_PATH, selected_loader
+            )
+            st.session_state["app"] = create_app()
