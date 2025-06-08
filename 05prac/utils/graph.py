@@ -41,3 +41,34 @@ def classify_node(state: RAGState):
 
     print("모드 결정 {mode}")
     return {"mode": mode}
+
+
+# 추론 노드
+def reasoning(state: RAGState):
+    """검색된 문서와 질문을 기반으로 추론 과정을 생성합니다."""
+    query = state["query"]
+    documents = state.get("documents", [])
+
+    # 문서 내용을 추출하여 컨텍스트로 사용
+    context = "\n\n".join([doc.page_context for doc in documents])
+
+    reasoning_prompt = ChatPromptTemplate.from_template(
+        """주어진 문서를 활용하여 사용자의 질문에 가장 적절한 답변을 작성해주세요.
+        문서가 없다면 일반적인 지식으로 답변을 시도하세요.
+
+        질문: {query}
+
+        문서 내용:
+        {context}
+
+
+        상세 추론:"""
+    )
+
+    reasoning_chain = reasoning_prompt | reasoning_llm | StrOutputParser()
+
+    print("추론 시작")
+
+    thinking = reasoning_chain.invoke({"query": query, "context": context})
+    print("===추론완료===")
+    return {"thinking": thinking}

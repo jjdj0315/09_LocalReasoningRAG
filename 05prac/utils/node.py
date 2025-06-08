@@ -10,6 +10,6 @@ def create_app():
 
     # 노드추가
     workflow.add_node("classify", classify_node)
-
+    workflow.add_node("reasoning", )
     app = ddd
     return app
