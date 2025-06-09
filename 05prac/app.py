@@ -4,6 +4,7 @@ from utils.uuid import random_uuid
 from utils.print_messages import print_messages
 from utils.upload import upload_file
 from utils.create_compression_retriever import creat_compression_retriever
+from utils.node import create_app
 
 st.title("LOCAL LLM RAG")
 st.markdown("OnPromise LLM RAG")

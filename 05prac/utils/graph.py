@@ -1,7 +1,11 @@
+import streamlit as st
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
+from typing import Literal
+
 from .state import RAGState
-from .model import reasoning_llm
+from .model import reasoning_llm, answer_llm
+
 
 classify_llm_chain = ChatPromptTemplate.from_template(
     """
@@ -72,3 +76,62 @@ def reasoning(state: RAGState):
     thinking = reasoning_chain.invoke({"query": query, "context": context})
     print("===추론완료===")
     return {"thinking": thinking}
+
+
+# 2. 문서 검색 노드 (Retriever)
+def retrieve(state: RAGState):
+    """압축 리트리버를 사용하여 관련 문서를 검색합니다."""
+    print("=====문서 검색 시작=====")
+    query = state["query"]
+    retriever = st.session_state["compression_retriever"]
+    documents = retriever.invoke(query)
+    print("=====문서 검색 완료=====")
+    return {"documents": documents}
+
+
+# 4. 답변 생성 노드 (Answer LLM)
+def generate(state: RAGState):
+    """문서와 추론 과정을 기반으로 최종 답변을 생성합니다."""
+
+    query = state["query"]
+    thinking = state.get("thinking", "")  # get 메서드로 안전하게 접근
+    documents = state.get("documents", [])  # get 메서드로 안전하게 접근
+
+    # 문서 내용 추출
+    context = "\n\n".join([doc.page_content for doc in documents])
+
+    # 최종 답변 생성을 위한 프롬프트
+    answer_prompt = ChatPromptTemplate.from_template(
+        """사용자 질문에 한글로 답변하세요. 제공된 문서와 추론 과정이 있다면, 최대한 활용하세요.
+        문서나 추론 과정이 부족하더라도 사용자 질문에 자연스럽게 답변하세요.
+
+        질문: {query}
+
+        추론 과정:
+        {thinking}
+
+        문서 내용:
+        {context}
+
+        답변:"""
+    )
+
+    answer_chain = answer_prompt | answer_llm | StrOutputParser()
+
+    print("=====답변 생성 시작=====")
+    # stream() 대신 invoke()를 사용하여 전체 결과 한 번에 받기
+    answer = answer_chain.invoke(
+        {"query": query, "context": context, "thinking": thinking}
+    )
+    print("=====답변 생성 완료=====")
+    return {"answer": answer}
+
+# 라우팅 함수 - 중요: 여기서는 다음 노드를 결정하는 라우팅 함수
+def route_by_mode(state: RAGState) -> Literal["retrieve", "generate"]:
+    """분류 결과에 따라 다음 노드를 결정합니다."""
+    print(f"=====라우팅: {state['mode']}=====")
+    if state["mode"] == "retrieve":
+        return "retrieve"
+    elif state["mode"] == "generate":
+        return "generate"
+    raise ValueError("Invalid mode set in state")
