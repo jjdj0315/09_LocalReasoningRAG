@@ -6,14 +6,16 @@ from utils.create_dir import create_dir
 from utils.upload import upload_file
 from utils.creat_compression_retriever import creat_compression_retriever
 from utils.node import create_app
+
 from utils.print_message import print_messages
 from utils.add_message import add_message
+
 from utils.state import RAGState # RAGState 임포트
 from langchain_core.messages import HumanMessage, AIMessage # <-- 추가 임포트
 
-#세션 초기화
+# 세션 초기화
 session_control()
-#디렉터리 생성
+# 디렉터리 생성
 create_dir()
 
 st.set_page_config(page_title="100% 오픈모델 RAG , made by DJ")
